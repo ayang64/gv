@@ -34,6 +34,7 @@ func Encode(w io.Writer, img image.Image) {
 				return ""
 			}
 			fmt.Printf("%s ", color())
+			prevr, prevg, prevb = r, g, b
 		}
 	}
 }
