@@ -25,6 +25,7 @@ func Encode(w io.Writer, img image.Image) {
 	prevr, prevg, prevb := uint32(0), uint32(0), uint32(0)
 
 	buf := &bytes.Buffer{}
+	os.Stdout.Write([]byte("\x1b[;f"))
 
 	for y := 0; y < rect.Max.Y; y++ {
 		for x := 0; x < rect.Max.X; x++ {
