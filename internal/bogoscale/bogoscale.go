@@ -3,6 +3,7 @@ package bogoscale
 import (
 	"image"
 	"image/color"
+	"log"
 	"math"
 )
 
@@ -33,7 +34,7 @@ func Scale(img image.Image, width int, height int) image.Image {
 			// we don't care about the alpha channel
 			r, g, b, _ := c.RGBA()
 
-			xx, yy := int(math.Round(float64(x)*xscale)), int(math.Floor(float64(y)*yscale))
+			xx, yy := int(math.Floor(float64(x)*xscale)), int(math.Floor(float64(y)*yscale))
 			pos := (yy * width) + xx
 
 			output[pos].Red += uint64(r >> 8)
