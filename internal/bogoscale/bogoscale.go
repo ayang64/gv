@@ -3,7 +3,6 @@ package bogoscale
 import (
 	"image"
 	"image/color"
-	"log"
 	"math"
 )
 
