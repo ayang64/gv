@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -23,20 +24,24 @@ func Encode(w io.Writer, img image.Image) {
 	// code if the color hasn't changed.
 	prevr, prevg, prevb := uint32(0), uint32(0), uint32(0)
 
+	buf := &bytes.Buffer{}
+
 	for y := 0; y < rect.Max.Y; y++ {
 		for x := 0; x < rect.Max.X; x++ {
 			col := img.At(x, y)
 			r, g, b, _ := col.RGBA()
-			color := func() string {
-				if r != prevr || g != prevg || b != prevb {
-					return fmt.Sprintf("%c[48;2;%d;%d;%dm", 0x1b, r>>8, g>>8, b>>8)
-				}
-				return ""
+
+			if r != prevr || g != prevg || b != prevb {
+				buf.Write([]byte(fmt.Sprintf("\x1b[48;2;%d;%d;%dm", r>>8, g>>8, b>>8)))
 			}
-			fmt.Printf("%s ", color())
+			buf.Write([]byte{' '})
 			prevr, prevg, prevb = r, g, b
 		}
 	}
+
+	buf.Write([]byte("\x1b[48;2;0;0;0m"))
+
+	io.Copy(w, buf)
 }
 
 func view(p string) error {
