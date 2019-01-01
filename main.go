@@ -22,21 +22,36 @@ func Encode(w io.Writer, img image.Image) {
 
 	// minor optimization -- store the previous color and avoid emitting escape
 	// code if the color hasn't changed.
-	prevr, prevg, prevb := uint32(0), uint32(0), uint32(0)
+
+	prevTop := [3]uint32{0, 0, 0}
+	prevBottom := [3]uint32{0, 0, 0}
 
 	buf := &bytes.Buffer{}
 	os.Stdout.Write([]byte("\x1b[;f"))
 
-	for y := 0; y < rect.Max.Y; y++ {
+	for y := 0; y < rect.Max.Y; y += 2 {
 		for x := 0; x < rect.Max.X; x++ {
+
 			col := img.At(x, y)
 			r, g, b, _ := col.RGBA()
 
-			if r != prevr || g != prevg || b != prevb {
-				buf.Write([]byte(fmt.Sprintf("\x1b[48;2;%d;%d;%dm", r>>8, g>>8, b>>8)))
+			curTop := [3]uint32{r >> 8, g >> 8, b >> 8}
+
+			if y == 0 || curTop != prevTop {
+				buf.Write([]byte(fmt.Sprintf("\x1b[38;2;%d;%d;%dm", r>>8, g>>8, b>>8)))
+				prevTop = curTop
 			}
-			buf.Write([]byte{' '})
-			prevr, prevg, prevb = r, g, b
+
+			col = img.At(x, y+1)
+			r, g, b, _ = col.RGBA()
+			curBottom := [3]uint32{r >> 8, g >> 8, b >> 8}
+
+			if y == 0 || curBottom != prevBottom {
+				buf.Write([]byte(fmt.Sprintf("\x1b[48;2;%d;%d;%dm", r>>8, g>>8, b>>8)))
+				prevBottom = curBottom
+			}
+
+			buf.WriteRune('▀')
 		}
 	}
 
@@ -76,7 +91,7 @@ func view(p string) error {
 		return err
 	}
 
-	outputimage := bogoscale.Scale(img, width, height-1)
+	outputimage := bogoscale.Scale(img, width, (height-1)*2)
 
 	Encode(os.Stdout, outputimage)
 
@@ -91,4 +106,8 @@ func main() {
 	if err := view(os.Args[1]); err != nil {
 		log.Fatal(err)
 	}
+
+	// reset terminal to default foreground and background color.
+	os.Stdout.Write([]byte("\x1b[39;m"))
+	os.Stdout.Write([]byte("\x1b[49;m"))
 }
