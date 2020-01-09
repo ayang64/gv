@@ -29,19 +29,26 @@ func view(p string) error {
 		".png":  png.Decode,
 	}
 
-	decode, exists := decmap[path.Ext(p)]
+	decoder, exists := decmap[path.Ext(p)]
 	if exists == false {
 		return fmt.Errorf("no decoder for %s", p)
 	}
 
-	r, err := os.Open(p)
+	// simple wrapper function that lets us take advantage of defer to
+	// clean up the results of os.Open()
+	decode := func() (image.Image, error) {
+		r, err := os.Open(p)
+		if err != nil {
+			return nil, err
+		}
+		defer r.Close()
+		return decoder(r)
+	}
 
+	img, err := decode()
 	if err != nil {
 		return err
 	}
-
-	img, err := decode(r)
-	r.Close()
 
 	width, height, err := terminal.GetSize(0)
 	if err != nil {
