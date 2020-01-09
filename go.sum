@@ -1,3 +1,5 @@
+github.com/ayang64/asciiart v0.0.0-20200109205229-517d0c9cb021 h1:dNd7l/2P5EL1rbTTG7vWNx139ZObIUtTs1E36L44UXw=
+github.com/ayang64/asciiart v0.0.0-20200109205229-517d0c9cb021/go.mod h1:mJfNYAtetIDVRpiEPHK1sJeGYQthcxn/p2H4B7SVjqE=
 golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9 h1:mKdxBk7AujPs8kU4m80U72y/zjbZ3UcXC7dClwKbUI0=
 golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/sys v0.0.0-20181228144115-9a3f9b0469bb h1:pf3XwC90UUdNPYWZdFjhGBE7DUFuK3Ct1zWmZ65QN30=

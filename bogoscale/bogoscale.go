@@ -6,9 +6,11 @@ import (
 	"math"
 )
 
-// bogo scale.  apply an averaging type filter to input image and translate to
-// resulting bitmap.
-func Scale(img image.Image, width int, height int) image.Image {
+func scaleUp(img image.Image, width int, height int) image.Image {
+	return nil
+}
+
+func scaleDown(img image.Image, width int, height int) image.Image {
 	rect := img.Bounds()
 
 	// 64 bits might be overzealous
@@ -21,11 +23,11 @@ func Scale(img image.Image, width int, height int) image.Image {
 
 	output := make([]point, width*height, width*height)
 
-	yscale := float64(height) / float64(rect.Max.Y)
-	xscale := float64(width) / float64(rect.Max.X)
+	yscale := float64(height) / float64(rect.Max.Y-rect.Min.Y)
+	xscale := float64(width) / float64(rect.Max.X-rect.Min.X)
 
-	for y := 0; y < rect.Max.Y; y++ {
-		for x := 0; x < rect.Max.X; x++ {
+	for y := rect.Min.Y; y < rect.Max.Y; y++ {
+		for x := rect.Min.X; x < rect.Max.X; x++ {
 			// map x and y
 
 			c := img.At(x, y)
@@ -69,4 +71,21 @@ func Scale(img image.Image, width int, height int) image.Image {
 	}
 
 	return rc
+}
+
+// bogo scale.  apply an averaging type filter to input image and translate to
+// resulting bitmap.
+func Scale(img image.Image, width int, height int) image.Image {
+	rect := img.Bounds()
+
+	sourceWidth := float64(rect.Max.Y - rect.Min.Y)
+	sourceHeight := float64(rect.Max.X - rect.Min.X)
+
+	if srcDensity, targetDensity := (sourceWidth * sourceHeight), float64(width*height); srcDensity < targetDensity {
+		// were scaling up
+		return scaleUp(img, width, height)
+	}
+
+	// we're scaling down
+	return scaleDown(img, width, height)
 }
